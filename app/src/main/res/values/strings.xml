@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Guess Auto</string>
+    <string name="score">Score: </string>
+    <string name="second">second</string>
+
+    <string name="game">Start game</string>
+    <string name="menu">Menu</string>
+    <string name="help">Help</string>
+    <string name="scrores">Records</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
+    <string name="volumeon">Volume On</string>
+    <string name="volumeoff">Volume Off</string>
+    <string name="changeName">Nickname</string>
+    <string name="add">OK</string>
+    <string name="record">Your record:</string>
+    <string name="title">Congratulations!</string>
+    <string name="alert">You have a new highscore:</string>
+    <string name="title2">Excellent result!</string>
+    <string name="alert2">Your score:</string>
+    <string name="blok">ca-app-pub-5215138241700973/2767817509</string>
+</resources>

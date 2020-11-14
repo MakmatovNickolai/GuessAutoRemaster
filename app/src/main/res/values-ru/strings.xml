@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add">Ок</string>
+    <string name="alert">Вы поставили новый рекорд:</string>
+    <string name="alert2">Набранные очки:</string>
+    <string name="app_name">Угадай авто</string>
+    <string name="blok">ca-app-pub-5215138241700973/2767817509</string>
+    <string name="changeName">Никнейм</string>
+    <string name="exit">Выход</string>
+    <string name="game">Начать игру</string>
+    <string name="help">Помощь</string>
+    <string name="menu">Меню</string>
+    <string name="record">Ваш рекорд:</string>
+    <string name="score">Очки:</string>
+    <string name="scrores">Рекорды</string>
+    <string name="second">second</string>
+    <string name="settings">Настройки</string>
+    <string name="title">Поздравляем!</string>
+    <string name="title2">Хороший результат!</string>
+    <string name="volumeoff">Звук выключен</string>
+    <string name="volumeon">Звук включен</string>
+</resources>
