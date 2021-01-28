@@ -4,7 +4,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <LinearLayout
+        android:id="@+id/menuMain"
         android:layout_width="0dp"
         android:layout_height="500dp"
         android:layout_margin="10dp"
@@ -26,9 +28,17 @@
             android:text="@string/scrores" />
 
         <TextView
+            android:id="@+id/change"
+            style="@style/ExitFont"
+            android:onClick="onMenuItemClick"
+            android:text="@string/changeName" />
+
+        <TextView
             android:id="@+id/exit"
             style="@style/ExitFont"
             android:onClick="onMenuItemClick"
             android:text="@string/exit" />
+
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

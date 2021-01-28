@@ -2,6 +2,9 @@
 <resources>
     <string name="add">Ок</string>
     <string name="alert">Вы поставили новый рекорд:</string>
+    <string name="completed">Больше авто не осталось! Счет:</string>
+    <string name="auto">Авто</string>
+    <string name="attempts">Попыток:</string>
     <string name="alert2">Набранные очки:</string>
     <string name="app_name">Угадай авто</string>
     <string name="blok">ca-app-pub-5215138241700973/2767817509</string>
@@ -19,4 +22,6 @@
     <string name="title2">Хороший результат!</string>
     <string name="volumeoff">Звук выключен</string>
     <string name="volumeon">Звук включен</string>
+    <string name="changeNickname">Установите никнейм:</string>
+    <string name="topGamers">Топ игроков:</string>
 </resources>

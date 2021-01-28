@@ -2,8 +2,10 @@
     <string name="app_name">Guess Auto</string>
     <string name="score">Score: </string>
     <string name="second">second</string>
+    <string name="attempts">Attempts:</string>
 
     <string name="game">Start game</string>
+    <string name="auto">Auto</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>
     <string name="scrores">Records</string>
@@ -16,7 +18,10 @@
     <string name="record">Your record:</string>
     <string name="title">Congratulations!</string>
     <string name="alert">You have a new highscore:</string>
+    <string name="completed">No more auto left! Your score:</string>
     <string name="title2">Excellent result!</string>
     <string name="alert2">Your score:</string>
     <string name="blok">ca-app-pub-5215138241700973/2767817509</string>
+    <string name="changeNickname">Set your nickname:</string>
+    <string name="topGamers">Топ игроков:</string>
 </resources>

@@ -14,7 +14,7 @@ class DBHelper(private val fContext: Context) :
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE " + TABLE_NAME + " ("
-                    + "id INTEGER PRIMARY KEY, " + "autoID TEXT, " + "autoDrawableName TEXT, " + "buttons TEXT"
+                    + "id INTEGER PRIMARY KEY, " + "AutoName TEXT, " + "buttons TEXT, " + "link TEXT"
                     + ");"
         )
 
@@ -34,14 +34,15 @@ class DBHelper(private val fContext: Context) :
                 if (eventType == XmlPullParser.START_TAG
                     && xml.name == "record"
                 ) {
-                    // Тег Record найден, теперь получим его атрибуты и
+                    // Тег Record найден, теперь получим его атрибутыxxx и
                     // вставляем в таблицу
-                    val autoID = xml.getAttributeValue(0)
-                    val drawableName = xml.getAttributeValue(1)
-                    val buttons = xml.getAttributeValue(2)
-                    values.put("autoID", autoID)
-                    values.put("autoDrawableName", drawableName)
+                    val link = xml.getAttributeValue(null, "link")
+                    val autoName = xml.getAttributeValue(null, "AutoName")
+                    val buttons = xml.getAttributeValue(null, "buttons")
+
+                    values.put("AutoName", autoName)
                     values.put("buttons", buttons)
+                    values.put("link", link)
                     db.insert(TABLE_NAME, null, values)
                 }
                 eventType = xml.next()
@@ -54,11 +55,11 @@ class DBHelper(private val fContext: Context) :
         }
     }
 
-    fun getAllCaptionsForAuto(autoId: String) : MutableList<String> {
-        val selectQuery = "SELECT  * FROM mytable WHERE autoDrawableName = ?"
+    fun getAllCaptionsForAuto(autoName: String) : MutableList<String> {
+        val selectQuery = "SELECT  buttons FROM mytable WHERE AutoName = ?"
         var captions = "No captions fetched from db"
 
-        database.rawQuery(selectQuery, arrayOf(autoId)).use { // .use requires API 16
+        database.rawQuery(selectQuery, arrayOf(autoName)).use {
             if (it.moveToFirst()) {
                 captions = it.getString(it.getColumnIndex("buttons"))
             }
@@ -68,12 +69,12 @@ class DBHelper(private val fContext: Context) :
         return res
     }
 
-    fun getAutoNameById(autoId:String) : String {
-        val sqlQuery = "select autoID from mytable where autoDrawableName = ?"
+    fun getAutoLinkBName(AutoName:String) : String {
+        val sqlQuery = "select link from mytable where AutoName = ?"
         var res = "No auto fetched from db"
-        database.rawQuery(sqlQuery, arrayOf(autoId)).use {
+        database.rawQuery(sqlQuery, arrayOf(AutoName)).use {
             if (it.moveToFirst()) {
-                res = it.getString(it.getColumnIndex("autoID"))
+                res = it.getString(it.getColumnIndex("link"))
                 it.close()
             }
         }
@@ -82,9 +83,9 @@ class DBHelper(private val fContext: Context) :
 
     fun getAllAuto(): MutableList<String> {
         val temp = mutableListOf<String>()
-        database.query("mytable", arrayOf("autoDrawableName"), null, null, null, null, null).use {
+        database.query("mytable", arrayOf("AutoName"), null, null, null, null, null).use {
             if (it.moveToFirst()) {
-                val imageColIndex = it.getColumnIndex("autoDrawableName")
+                val imageColIndex = it.getColumnIndex("AutoName")
                 temp.add(it.getString(imageColIndex))
                 while (it.moveToNext()) {
                     temp.add(it.getString(imageColIndex))

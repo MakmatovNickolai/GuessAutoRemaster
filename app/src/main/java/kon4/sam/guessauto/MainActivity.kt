@@ -1,27 +1,46 @@
 package kon4.sam.guessauto
 
+import android.R.attr.shape
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import kon4.sam.guessauto.App.Companion.APP_PREFERENCES
+import kon4.sam.guessauto.App.Companion.APP_PREFERENCES_USERNAME
 import kon4.sam.guessauto.data.DBHelper
+import kon4.sam.guessauto.network.ApiClient
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.fragment_user.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class MainActivity : AppCompatActivity() {
     private var hearts: Array<ImageView> = arrayOf()
     private lateinit var dbHelper: DBHelper
     private lateinit var timer: CountDownTimer
     private lateinit var allCarImages: MutableList<String>
-    private var currentPhotoDrawableIdentifier = 0
+    private lateinit var currentPhotoAutoName:String
     private var currentPhotoIndex = 0
     private var score = 0
     private var attempt = 0
@@ -31,62 +50,92 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+        setupToolbar()
+        setupButtonsCorners()
+
         dbHelper = DBHelper(this)
         allCarImages = dbHelper.getAllAuto()
         allCarImages.shuffle()
 
-        setRandomImage()
-        setButtonsText()
 
         hearts = arrayOf(heart1, heart2, heart3)
-        timer = object : CountDownTimer(15000, 50) {
+        timer = object : CountDownTimer(10000, 50) {
             override fun onTick(millisUntilFinished: Long) {
-                progressBar.progress = millisUntilFinished.toInt() / 150
+                progressBar.progress = millisUntilFinished.toInt() / 100
             }
 
             override fun onFinish() {
                 loseAttempt()
             }
         }
-        timer.start()
+
+        setRandomImage()
     }
 
+    private fun setupButtonsCorners() {
+        (button1.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(70f, 70f, 0f, 0f, 0f, 0f, 0f, 0f)
+        (button2.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 70f, 70f, 0f, 0f, 0f, 0f)
+        (button4.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 70f, 70f, 0f, 0f)
+        (button3.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 70f, 70f)
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(toolbar)
+        if (supportActionBar != null) {
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true);
+            supportActionBar!!.setDisplayShowHomeEnabled(true);
+            supportActionBar!!.setDisplayShowTitleEnabled(false)
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 
     fun pressButton(view: View) {
         view as Button
         setButtonsEnabled(false)
         timer.cancel()
-        if (currentPhotoIndex == 50) {
-            saveResultToPrefs()
-            showFinalDialog(R.string.title, R.string.alert, R.drawable.starwin)
-        }
 
-        val correctAutoName = dbHelper.getAutoNameById(
-                resources.getResourceEntryName(
-                        currentPhotoDrawableIdentifier
-                )
-        )
         val chosenAutoButtonText = view.text.toString()
-        if (chosenAutoButtonText == correctAutoName) {
+        var isAnswerCorrect = false
+        if (chosenAutoButtonText == currentPhotoAutoName) {
+            isAnswerCorrect = true
+            score += progressBar.progress
             onSuccessAnswer(view)
-            setNewCard()
         } else {
             onWrongAnswer(view)
-            loseAttempt()
         }
+        setCaption()
+        when {
+            currentPhotoIndex == allCarImages.size -> {
+                saveResultToPrefs()
+                showFinalDialog(R.string.title, R.string.completed, R.drawable.starwin)
+                return
+            }
+            isAnswerCorrect -> {
+                setNewCard()
+            }
+            !isAnswerCorrect -> {
+                loseAttempt()
+            }
+        }
+    }
+
+    private fun setCaption() {
+        val scoreCaption =  resources.getString(R.string.auto) +": ${currentPhotoIndex}\\${allCarImages.size} " + resources.getString(R.string.score) + " " + score + " "
+        scoreText.text = scoreCaption
     }
 
     private fun onSuccessAnswer(view: View) {
         playSound(R.raw.success)
-        score += progressBar.progress
-        val scoreCaption = resources.getString(R.string.score) + " " + score
-        scoreText.text = scoreCaption
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorGreen))
+        (view.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorGreen))
     }
 
     private fun onWrongAnswer(view: View) {
         playSound(R.raw.fail)
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorRed))
+        (view.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorRed))
     }
 
     private fun isLastAttempt(): Boolean {
@@ -107,7 +156,6 @@ class MainActivity : AppCompatActivity() {
         if (score > getCurrentResultFromPrefs()) {
             saveResultToPrefs()
             showFinalDialog(R.string.title, R.string.alert, R.drawable.starwin)
-
         } else {
             showFinalDialog(R.string.title2, R.string.alert2, R.drawable.star)
         }
@@ -129,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
+
     private fun setNewCard() {
         carImage.animate().alpha(0f)
             .setDuration(PHOTO_APPEARING_TIME)
@@ -136,42 +185,63 @@ class MainActivity : AppCompatActivity() {
                 override fun onAnimationEnd(animation: Animator) {
                     carImage.alpha = 1f
                     setRandomImage()
-                    setButtonsText()
-                    setButtonsDefaultBackgorund()
-                    setButtonsEnabled(true)
-                    timer.start()
                 }
             })
     }
 
     private fun setRandomImage() {
-        currentPhotoDrawableIdentifier = resources.getIdentifier(
-            allCarImages[currentPhotoIndex],
-            "drawable",
-            applicationContext.packageName
-        )
-        carImage.setImageResource(currentPhotoDrawableIdentifier)
-        currentPhotoIndex++
+        currentPhotoAutoName =  allCarImages[currentPhotoIndex]
+        val nextImageLink = dbHelper.getAutoLinkBName(allCarImages[currentPhotoIndex])
+
+        progressBar2.visibility = View.VISIBLE
+        Glide
+            .with(this)
+            .load(nextImageLink)
+            .listener(object : RequestListener<Drawable> {
+
+                override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable>?,
+                        isFirstResource: Boolean
+                ): Boolean {
+                    progressBar2.visibility = View.GONE
+                    Toast.makeText(this@MainActivity, "Не удалось загрузить фото, похоже проблемы с интернетом", Toast.LENGTH_LONG).show()
+                    return false
+                }
+
+                override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                ): Boolean {
+                    progressBar2.visibility = View.GONE
+                    setButtonsText()
+                    setButtonsDefaultBackground()
+                    setButtonsEnabled(true)
+                    timer.start()
+                    currentPhotoIndex++
+                    return false
+                }
+            })
+            .into(carImage)
     }
 
     private fun setButtonsText() {
-        val buttons = dbHelper.getAllCaptionsForAuto(
-            resources.getResourceEntryName(
-                currentPhotoDrawableIdentifier
-            )
-        )
+        val buttons = dbHelper.getAllCaptionsForAuto(currentPhotoAutoName)
         button1.text = buttons[0]
         button2.text = buttons[1]
         button3.text = buttons[2]
         button4.text = buttons[3]
     }
 
-    private fun setButtonsDefaultBackgorund() {
-        val color = ContextCompat.getColor(this, R.color.colorPrimary)
-        button1.setBackgroundColor(color)
-        button2.setBackgroundColor(color)
-        button3.setBackgroundColor(color)
-        button4.setBackgroundColor(color)
+    private fun setButtonsDefaultBackground() {
+        (button1.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        (button2.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        (button3.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        (button4.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
     }
 
     private fun setButtonsEnabled(enabled: Boolean) {
@@ -181,23 +251,11 @@ class MainActivity : AppCompatActivity() {
         button4.isEnabled = enabled
     }
 
-    fun toMenu(view: View?) {
-        onBackPressed()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        dbHelper.close()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
         timer.cancel()
-    }
-
-    override fun onBackPressed() {
-        playSound(R.raw.trans)
-        super.onBackPressed()
+        dbHelper.close()
     }
 
     private fun playSound(soundId: Int) {
@@ -210,23 +268,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveResultToPrefs() {
-        val editor = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).edit()
-        editor.putInt(APP_PREFERENCES_SCORE, score)
-        editor.apply()
+
+        val user_name = applicationContext.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(
+            APP_PREFERENCES_USERNAME, "")!!
+
+        ApiClient().getApiService(this).set_score(user_name, score.toString()).enqueue(object :
+            Callback<String> {
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.i("DEV", call.toString())
+                Log.i("DEV", t.message.toString())
+
+            }
+
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                val res = response.body()
+
+
+                if (res == "OK") {
+                    Log.i("DEV", "SAVED SCORE")
+                } else {
+
+                }
+            }
+        })
+
+        App.score = score
     }
 
     private fun getCurrentResultFromPrefs(): Int {
-        return getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getInt(
-            APP_PREFERENCES_SCORE,
-            0
-        )
+        return App.score
     }
 
 
     companion object {
         const val PHOTO_APPEARING_TIME:Long = 2400
-        const val LOG_TAG = "LOG_TAG"
-        const val APP_PREFERENCES = "mysettings"
-        private const val APP_PREFERENCES_SCORE = "score"
     }
 }
