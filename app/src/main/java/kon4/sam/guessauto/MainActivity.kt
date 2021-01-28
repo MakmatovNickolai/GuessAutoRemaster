@@ -1,6 +1,5 @@
 package kon4.sam.guessauto
 
-import android.R.attr.shape
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.AlertDialog
@@ -22,7 +21,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import kon4.sam.guessauto.App.Companion.APP_PREFERENCES
 import kon4.sam.guessauto.App.Companion.APP_PREFERENCES_USERNAME
 import kon4.sam.guessauto.data.DBHelper
@@ -33,6 +37,7 @@ import kotlinx.android.synthetic.main.fragment_user.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,11 +49,14 @@ class MainActivity : AppCompatActivity() {
     private var currentPhotoIndex = 0
     private var score = 0
     private var attempt = 0
+    private var mInterstitialAd: InterstitialAd? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        MobileAds.initialize(this) { }
 
         setupToolbar()
         setupButtonsCorners()
@@ -73,10 +81,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtonsCorners() {
-        (button1.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(70f, 70f, 0f, 0f, 0f, 0f, 0f, 0f)
-        (button2.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 70f, 70f, 0f, 0f, 0f, 0f)
-        (button4.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 70f, 70f, 0f, 0f)
-        (button3.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 70f, 70f)
+        (button1.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(
+            70f,
+            70f,
+            0f,
+            0f,
+            0f,
+            0f,
+            0f,
+            0f
+        )
+        (button2.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(
+            0f,
+            0f,
+            70f,
+            70f,
+            0f,
+            0f,
+            0f,
+            0f
+        )
+        (button4.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(
+            0f,
+            0f,
+            0f,
+            0f,
+            70f,
+            70f,
+            0f,
+            0f
+        )
+        (button3.background.mutate() as GradientDrawable).cornerRadii = floatArrayOf(
+            0f,
+            0f,
+            0f,
+            0f,
+            0f,
+            0f,
+            70f,
+            70f
+        )
     }
 
     private fun setupToolbar() {
@@ -124,18 +168,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCaption() {
-        val scoreCaption =  resources.getString(R.string.auto) +": ${currentPhotoIndex}\\${allCarImages.size} " + resources.getString(R.string.score) + " " + score + " "
+        val scoreCaption =  resources.getString(R.string.auto) +": ${currentPhotoIndex}\\${allCarImages.size} " + resources.getString(
+            R.string.score
+        ) + " " + score + " "
         scoreText.text = scoreCaption
     }
 
     private fun onSuccessAnswer(view: View) {
         playSound(R.raw.success)
-        (view.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorGreen))
+        (view.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorGreen
+            )
+        )
     }
 
     private fun onWrongAnswer(view: View) {
         playSound(R.raw.fail)
-        (view.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorRed))
+        (view.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorRed
+            )
+        )
     }
 
     private fun isLastAttempt(): Boolean {
@@ -170,7 +226,27 @@ class MainActivity : AppCompatActivity() {
             setIcon(iconId)
             setMessage(resources.getString(messageId) + " " + score)
             setPositiveButton("ОК") { _, _ ->
-                onBackPressed()
+                val adRequest = AdRequest.Builder().build()
+
+                InterstitialAd.load(
+                    this@MainActivity,
+                    resources.getString(R.string.adMobINterstitalId),
+                    adRequest,
+                    object : InterstitialAdLoadCallback() {
+                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                            // The mInterstitialAd reference will be null until
+                            // an ad is loaded.
+                            mInterstitialAd = interstitialAd
+                            Log.i("Dev", "onAdLoaded")
+                        }
+
+                        override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                            // Handle the error
+                            Log.i("Dev", loadAdError.message)
+                            mInterstitialAd = null
+                        }
+                    })
+                //onBackPressed()
             }
             setCancelable(false)
         }
@@ -200,22 +276,26 @@ class MainActivity : AppCompatActivity() {
             .listener(object : RequestListener<Drawable> {
 
                 override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable>?,
-                        isFirstResource: Boolean
+                    e: GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable>?,
+                    isFirstResource: Boolean
                 ): Boolean {
                     progressBar2.visibility = View.GONE
-                    Toast.makeText(this@MainActivity, "Не удалось загрузить фото, похоже проблемы с интернетом", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Не удалось загрузить фото, похоже проблемы с интернетом",
+                        Toast.LENGTH_LONG
+                    ).show()
                     return false
                 }
 
                 override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
+                    resource: Drawable?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
                 ): Boolean {
                     progressBar2.visibility = View.GONE
                     setButtonsText()
@@ -238,10 +318,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setButtonsDefaultBackground() {
-        (button1.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-        (button2.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-        (button3.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-        (button4.background as GradientDrawable).setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        (button1.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorPrimary
+            )
+        )
+        (button2.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorPrimary
+            )
+        )
+        (button3.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorPrimary
+            )
+        )
+        (button4.background as GradientDrawable).setColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorPrimary
+            )
+        )
     }
 
     private fun setButtonsEnabled(enabled: Boolean) {
@@ -269,8 +369,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveResultToPrefs() {
 
-        val user_name = applicationContext.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(
-            APP_PREFERENCES_USERNAME, "")!!
+        val user_name = applicationContext.getSharedPreferences(
+            APP_PREFERENCES,
+            Context.MODE_PRIVATE
+        ).getString(
+            APP_PREFERENCES_USERNAME, ""
+        )!!
 
         ApiClient().getApiService(this).set_score(user_name, score.toString()).enqueue(object :
             Callback<String> {
