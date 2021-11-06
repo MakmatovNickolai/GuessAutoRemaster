@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/kon4.sam.guessauto">
+    <item
+        android:state_pressed="false"
+        app:state_has_answer="false">
+        <shape>
+            <corners android:radius="12dp" />
+            <stroke android:width="@dimen/in_game_answer_button_stoke_width"
+                android:color="@color/bluePrimary" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400"
+                android:endColor="@color/greyPrimary"
+                android:startColor="#A4AAAE" />
+        </shape>
+    </item>
+    <item
+        android:state_pressed="true"
+        app:state_has_answer="false">
+        <shape>
+            <corners android:radius="12dp" />
+            <stroke android:width="1dip" android:color="#135059" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400"
+                android:endColor="@color/turquoise"
+                android:startColor="#127E8E" />
+        </shape>
+    </item>
+    <item
+        app:state_correct_answer="true"
+        app:state_has_answer="true">
+        <shape>
+            <corners android:radius="12dp" />
+            <stroke android:width="1dip" android:color="#135059" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400"
+                android:endColor="#08BF01"
+                android:startColor="#115A01" />
+        </shape>
+    </item>
+    <item
+        app:state_correct_answer="false"
+        app:state_has_answer="true">
+        <shape>
+            <corners android:radius="12dp" />
+            <stroke android:width="1dip" android:color="#135059" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400"
+                android:endColor="#97160D"
+                android:startColor="@color/redPrimary" />
+        </shape>
+    </item>
+</selector>

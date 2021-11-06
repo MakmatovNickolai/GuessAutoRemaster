@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="menu_button_width">180dp</dimen>
+    <dimen name="menu_button_margin_bottom">16dp</dimen>
+    <dimen name="menu_button_min_height">30dp</dimen>
+    <dimen name="menu_button_text_size">14sp</dimen>
+    <dimen name="menu_button_left_padding">12dip</dimen>
+    <dimen name="menu_button_right_padding">21dip</dimen>
+    <dimen name="menu_button_left_drawable_size">35dp</dimen>
+    <dimen name="menu_top_image_height">100dp</dimen>
+
+    <dimen name="toolbar_title">54sp</dimen>
+    <dimen name="score_in_game">16sp</dimen>
+    <dimen name="score_in_game_margin_top">4dp</dimen>
+    <dimen name="in_game_tv_margin_from_border">16dp</dimen>
+    <dimen name="in_game_timer_size">20dp</dimen>
+    <dimen name="in_game_progress_bar_height">10dp</dimen>
+    <dimen name="in_game_timer_margin_top">4dp</dimen>
+    <dimen name="in_game_answer_button_text_size">16sp</dimen>
+    <dimen name="in_game_answer_button_padding_horizontal">16dp</dimen>
+    <dimen name="in_game_answer_button_stoke_width">2dip</dimen>
+    <dimen name="in_game_answer_button_layout_margin_vertical">4dp</dimen>
+    <dimen name="in_game_attempts_text_size">14sp</dimen>
+    <dimen name="in_game_hearts_layout_margin_bottom">8dp</dimen>
+    <dimen name="in_game_heart_image_size">20dp</dimen>>
+
+    <dimen name="in_score_your_record_text_size">18sp</dimen>
+    <dimen name="in_score_your_record_vertical_padding">4dp</dimen>
+    <dimen name="in_score_top_gamers_text_size">22sp</dimen>
+    <dimen name="in_score_top_gamers_tv_height">30dp</dimen>
+    <dimen name="in_score_user_avatar_size">60dp</dimen>
+    <dimen name="in_score_user_avatar_margin_left">16dp</dimen>
+    <dimen name="in_score_user_name_tv_height">63dp</dimen>
+    <dimen name="in_score_user_name_text_size">20sp</dimen>
+    <dimen name="in_score_user_name_padding_left">8dp</dimen>
+
+    <dimen name="in_user_avatar_text_size">18sp</dimen>
+    <dimen name="in_user_avatar_size">110dp</dimen>
+    <dimen name="in_user_nickname_text_size">15sp</dimen>
+    <dimen name="in_user_nickname_edit_margin_horizontal">8dp</dimen>
+    <dimen name="in_user_save_button_height">40dp</dimen>
+    <dimen name="in_user_save_button_text_size">14sp</dimen>
+
+    <dimen name="end_game_dialog_width">300dp</dimen>
+    <dimen name="end_game_dialog_tv_margin_top">16dp</dimen>
+    <dimen name="endgame_dialog_text_size">14sp</dimen>
+
+    <dimen name="splash_text_size">40sp</dimen>
+</resources>

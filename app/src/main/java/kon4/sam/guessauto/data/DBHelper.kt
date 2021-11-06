@@ -4,17 +4,48 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import kon4.sam.guessauto.R
+import kon4.sam.guessauto.util.SharedPrefsHelper
 import org.xmlpull.v1.XmlPullParser
+import timber.log.Timber
 
-class DBHelper(private val fContext: Context) :
+class DBHelper(private val fContext: Context, private val sharedPrefsHelper: SharedPrefsHelper) :
     SQLiteOpenHelper(fContext, DATABASE_NAME, null, 1) {
+
     private var database = this.writableDatabase
+
+    override fun onOpen(db: SQLiteDatabase?) {
+        super.onOpen(db)
+
+        var xmlVersion = getXmlDbVersion()
+        val storedXmlVersion = sharedPrefsHelper.getStoredXmlDbVersion()
+        if (xmlVersion == null) {
+            xmlVersion = 1
+        }
+        if (xmlVersion > storedXmlVersion)  {
+            onUpgrade(db!!, storedXmlVersion, xmlVersion)
+        }
+    }
+
+    private fun getXmlDbVersion(): Int? {
+        val xml = fContext.resources.getXml(R.xml.autobase)
+        var eventType = xml.eventType
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && xml.name == "version") {
+                xml.getAttributeValue(null, "number").toIntOrNull().also { version ->
+                    return version
+                }
+            } else {
+                eventType = xml.next()
+            }
+        }
+        return 0
+    }
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE " + TABLE_NAME + " ("
-                    + "id INTEGER PRIMARY KEY, " + "AutoName TEXT, " + "buttons TEXT, " + "link TEXT"
+                    + "id INTEGER PRIMARY KEY, " + "AutoName TEXT, " +
+                    "buttons TEXT, " + "link TEXT"
                     + ");"
         )
 
@@ -34,7 +65,7 @@ class DBHelper(private val fContext: Context) :
                 if (eventType == XmlPullParser.START_TAG
                     && xml.name == "record"
                 ) {
-                    // Тег Record найден, теперь получим его атрибутыxxx и
+                    // Тег Record найден, теперь получим его атрибуты xxx и
                     // вставляем в таблицу
                     val link = xml.getAttributeValue(null, "link")
                     val autoName = xml.getAttributeValue(null, "AutoName")
@@ -47,8 +78,8 @@ class DBHelper(private val fContext: Context) :
                 }
                 eventType = xml.next()
             }
-        }catch (e: Exception) {
-            Log.e(LOG_TAG, e.message, e)
+        } catch (e: Exception) {
+            Timber.e(e)
         } finally {
             // Close the xml file
             xml.close()
@@ -69,7 +100,7 @@ class DBHelper(private val fContext: Context) :
         return res
     }
 
-    fun getAutoLinkBName(AutoName:String) : String {
+    fun getAutoLink(AutoName:String) : String {
         val sqlQuery = "select link from mytable where AutoName = ?"
         var res = "No auto fetched from db"
         database.rawQuery(sqlQuery, arrayOf(AutoName)).use {
@@ -97,14 +128,14 @@ class DBHelper(private val fContext: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (newVersion == 2) {
+        if (newVersion > oldVersion) {
             db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
             onCreate(db)
+            sharedPrefsHelper.saveXmlDbVersion(newVersion)
         }
     }
 
     companion object {
-        const val LOG_TAG = "LOG_TAG"
         private const val DATABASE_NAME = "myDB"
         const val TABLE_NAME = "mytable"
     }

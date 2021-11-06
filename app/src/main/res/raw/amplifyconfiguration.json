@@ -1,0 +1,40 @@
+{
+  "storage": {
+    "plugins": {
+      "awsS3StoragePlugin": {
+        "bucket": "guessauto",
+        "region": "eu-north-1"
+      }
+    }
+  },
+  "auth": {
+    "plugins": {
+      "awsCognitoAuthPlugin": {
+        "IdentityManager": {
+          "Default": {}
+        },
+        "CredentialsProvider": {
+          "CognitoIdentity": {
+            "Default": {
+              "PoolId": "eu-north-1:c5f995c6-e8a6-4ead-a822-22bd22209a0c",
+              "Region": "eu-north-1"
+            }
+          }
+        },
+        "CognitoUserPool": {
+          "Default": {
+            "PoolId": "eu-north-1_W1lB4gKdR",
+            "AppClientId": "69hgnhqpv7pt17vuj3lhq61mft",
+            "AppClientSecret": "1g8vrnhhsb7mb6napseda68co6v9f75m7rorruk44j95ce1qmfja",
+            "Region": "eu-north-1"
+          }
+        },
+        "Auth": {
+          "Default": {
+            "authenticationFlowType": "USER_SRP_AUTH"
+          }
+        }
+      }
+    }
+  }
+}

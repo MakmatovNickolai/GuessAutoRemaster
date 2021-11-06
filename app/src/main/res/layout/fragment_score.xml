@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:orientation="vertical"
+        android:background="@color/greyPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.ScoreFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_ios_new_24"
+            app:title="@string/records"
+            app:titleTextColor="@color/bluePrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/myRecordTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:fontFamily="@font/lato_medium"
+            android:gravity="center"
+            android:paddingVertical="@dimen/in_score_your_record_vertical_padding"
+            android:text="@string/your_record"
+            android:textAlignment="center"
+            android:textColor="@color/chartreusePrimary"
+            android:textSize="@dimen/in_score_your_record_text_size"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_score_top_gamers_tv_height"
+            android:layout_alignParentTop="true"
+            android:fontFamily="@font/lato_medium"
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            android:text="@string/top_gamers"
+            android:textAlignment="center"
+            android:textColor="@color/bluePrimary"
+            android:textSize="@dimen/in_score_top_gamers_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/myRecordTextView" />
+
+        <ProgressBar
+            android:id="@+id/topLoadingProgress"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:indeterminateDrawable="@drawable/circle_progressbar"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/scoreRecycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            tools:layout_editor_absoluteX="156dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/scoreRecycler"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            tools:listitem="@layout/score_item_recycler"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

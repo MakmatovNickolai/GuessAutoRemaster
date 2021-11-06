@@ -1,28 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="add">Ок</string>
-    <string name="alert">Вы поставили новый рекорд:</string>
-    <string name="completed">Больше авто не осталось! Счет:</string>
     <string name="auto">Авто</string>
-    <string name="attempts">Попыток:</string>
-    <string name="alert2">Набранные очки:</string>
     <string name="app_name">Угадай авто</string>
-    <string name="blok">ca-app-pub-5215138241700973/2767817509</string>
-    <string name="changeName">Никнейм</string>
-    <string name="exit">Выход</string>
-    <string name="game">Начать игру</string>
-    <string name="help">Помощь</string>
-    <string name="menu">Меню</string>
-    <string name="record">Ваш рекорд:</string>
-    <string name="score">Очки:</string>
-    <string name="scrores">Рекорды</string>
-    <string name="second">second</string>
-    <string name="settings">Настройки</string>
-    <string name="title">Поздравляем!</string>
-    <string name="title2">Хороший результат!</string>
-    <string name="volumeoff">Звук выключен</string>
-    <string name="volumeon">Звук включен</string>
-    <string name="changeNickname">Установите никнейм:</string>
-    <string name="topGamers">Топ игроков:</string>
-    <string name="adMobINterstitalId">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="profile">Профиль</string>
+    <string name="records">Рекорды</string>
+    <string name="share" >Поделиться</string>
+    <string name="rate_app">Оценить</string>
+    <string name="share_full_text">Новая игра \"Угадай авто\". Скачивай и играй! -> https://play.google.com/store/apps/details?id=kon4.sam.guessauto</string>
+    <string name="username_length_short_error">Никнейм должен содержать более 3 символов</string>
+    <string name="username_length_long_error">Никнейм должен содержать менее 20 символов</string>
+    <string name="no_response_from_server">Нет ответ от сервера =( Попробуй снова</string>
+    <string name="user_already_exists">Такой пользователь уже есть</string>
+    <string name="unknown_error">Неизвестная ошибка: %1$s</string>
+    <string name="user_changed">Никнейм успешно изменён</string>
+    <string name="no_internet_connection">Не удалось загрузить фото, похоже проблемы с интернетом</string>
+    <string name="gameOverText">Игра закончена</string>
+    <string name="choose_image_from_gallery">Галерея</string>
+    <string name="take_photo_by_camera">Камера</string>
+    <string name="remove_photo">Удалить</string>
+    <string name="invalidUserNameLength">Никнейм должен содержать от 4 до 20 символов</string>
+    <string name="save">Сохранить</string>
+    <string name="current_score">Очки:</string>
+    <string name="current_attempts">Попытки:</string>
+    <string name="start_game">Начать игру</string>
+    <string name="your_record">Ваш рекорд:</string>
+    <string name="congrats">Поздравляем!</string>
+    <string name="new_high_score">У вас новый рекорд!</string>
+    <string name="no_auto_left">Вы отгадали все авто! Ваш счет:</string>
+    <string name="excellent_result">Отличный результат!</string>
+    <string name="your_score">Ваши очки:</string>
+    <string name="current_nickname">Никнейм:</string>
+    <string name="top_gamers">Топ 150 игроков</string>
+    <string name="current_avatar">Аватар:</string>
+    <string name="are_you_sure">Вы уверены?</string>
+    <string name="you_will_lost_progress">Вы потеряете текущий прогресс!</string>
+    <string name="cancel">Отмена</string>
+    <string name="photo_changed_success">Фото успешно изменено</string>
 </resources>

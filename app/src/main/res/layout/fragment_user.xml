@@ -1,63 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".UserFragment">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewmodel"
+            type="kon4.sam.guessauto.view_model.UserViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/greyPrimary"
+        tools:context=".ui.UserFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_ios_new_24"
+            app:title="@string/profile"
+            app:titleTextColor="@color/bluePrimary"/>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profile_photo_icon"
+            android:layout_width="@dimen/in_user_avatar_size"
+            android:layout_height="@dimen/in_user_avatar_size"
+            android:layout_marginTop="8dp"
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:setImageFromUrl="@{viewmodel.url}"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
+            app:strokeColor="@color/bluePrimary"
+            app:strokeWidth="2dp"
+            tools:srcCompat="@drawable/avatar_default" />
+
+        <ProgressBar
+            android:id="@+id/loadingUsernameProgress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:indeterminateDrawable="@drawable/circle_progressbar"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:fontFamily="@font/lato_medium"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="8dp"
+            android:text="@string/current_nickname"
+            android:textAlignment="center"
+            android:textColor="@color/bluePrimary"
+            android:textSize="@dimen/in_user_nickname_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/textField"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textField" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/lato_medium"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="8dp"
+            android:text="@string/current_avatar"
+            android:textAlignment="center"
+            android:textColor="@color/bluePrimary"
+            android:textSize="@dimen/in_user_avatar_text_size"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textField"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/in_user_nickname_edit_margin_horizontal"
+            android:layout_marginLeft="@dimen/in_user_nickname_edit_margin_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="@dimen/in_user_nickname_edit_margin_horizontal"
+            android:layout_marginRight="@dimen/in_user_nickname_edit_margin_horizontal"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView4"
+            app:layout_constraintTop_toBottomOf="@+id/profile_photo_icon">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextTextPersonName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="20"
+                android:text="@={viewmodel.userName}"
+                android:textColor="@color/bluePrimary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:layout_height="@dimen/in_user_save_button_height"
+            android:layout_marginTop="16dp"
+            android:background="@color/bluePrimary"
+            android:fontFamily="@font/lato_medium"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:textSize="@dimen/in_user_save_button_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textField" />
+
+        <TextView
+            android:id="@+id/requestResultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/lato_medium"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="8dp"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/bluePrimary"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button" />
 
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/inform_cyr_normal"
-        android:gravity="center_horizontal"
-        android:paddingHorizontal="8dp"
-        android:text="@string/changeNickname"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textColor="@color/colorRed"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/editTextTextPersonName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:ems="10"
-        android:fontFamily="@font/inform_cyr_normal"
-        android:gravity="center_horizontal"
-        android:inputType="textPersonName"
-        android:paddingHorizontal="8dp"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textColor="@color/colorRed"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/textView4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorPrimary"
-        android:text="ОК"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.554"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
