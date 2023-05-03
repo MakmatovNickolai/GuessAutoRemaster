@@ -10,20 +10,22 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kon4.sam.guessauto.R
+import kon4.sam.guessauto.databinding.ActivitySplashBinding
 import kon4.sam.guessauto.view_model.SplashViewModel
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_splash.*
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySplashBinding
 
     private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         viewModel.getMyInfo()
+        viewModel.reloadAllCars()
         animateLaunchText()
     }
 
@@ -48,12 +50,12 @@ class SplashActivity : AppCompatActivity() {
             override fun onAnimationStart(animation: Animation?) {}
 
             override fun onAnimationEnd(arg0: Animation) {
-                launchTextView.startAnimation(disappearing)
+                binding.launchTextView.startAnimation(disappearing)
             }
 
             override fun onAnimationRepeat(animation: Animation?) {}
         })
 
-        launchTextView.startAnimation(appearing)
+        binding.launchTextView.startAnimation(appearing)
     }
 }

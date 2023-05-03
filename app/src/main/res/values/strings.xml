@@ -25,6 +25,7 @@
     <string name="username_length_short_error">Nickname must contain more than 3 symbols</string>
     <string name="username_length_long_error">Nickname must contain less than 21 symbols</string>
     <string name="user_changed">Nickname successfully changed</string>
+    <string name="user_update_success">Saved changes</string>
     <string name="no_internet_connection">Couldn\'t load photo, probably bad internet connection</string>
     <string name="gameOverText">Game over</string>>
     <string name="choose_image_from_gallery">Album</string>

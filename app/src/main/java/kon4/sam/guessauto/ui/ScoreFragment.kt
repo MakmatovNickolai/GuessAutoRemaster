@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.GroupieViewHolder
 import dagger.hilt.android.AndroidEntryPoint
 import kon4.sam.guessauto.App
@@ -19,13 +20,11 @@ import kon4.sam.guessauto.R
 import kon4.sam.guessauto.adapter.UserItem
 import kon4.sam.guessauto.databinding.FragmentScoreBinding
 import kon4.sam.guessauto.view_model.ScoreViewModel
-import kotlinx.android.synthetic.main.fragment_score.*
-import kotlinx.android.synthetic.main.fragment_score.toolbar2
 
 @AndroidEntryPoint
 class ScoreFragment : Fragment() {
 
-    private val adapter = GroupAdapter<GroupieViewHolder>()
+    private val adapter = GroupieAdapter()
     private val viewModel: ScoreViewModel by viewModels()
     private lateinit var binding: FragmentScoreBinding
 
@@ -38,31 +37,32 @@ class ScoreFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        toolbar2.setNavigationIcon(R.drawable.ic_baseline_arrow_back_ios_new_24)
-        toolbar2.setNavigationOnClickListener {
+        binding.toolbar2.setNavigationIcon(R.drawable.ic_baseline_arrow_back_ios_new_24)
+        binding.toolbar2.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
     }
 
     private fun setupObservers() {
-        viewModel.getAllScoreCompleted.observe(viewLifecycleOwner, { users ->
-            topLoadingProgress.visibility = View.GONE
+        viewModel.getAllScoreCompleted.observe(viewLifecycleOwner) { users ->
+            binding.topLoadingProgress.visibility = View.GONE
             val scoreText = resources.getString(R.string.your_record) + " " + App.user.score
-            val text =   if (App.user.user_name.isEmpty()) scoreText else App.user.user_name + ", " + scoreText
-            myRecordTextView.text = text
-            topLoadingProgress.visibility = View.GONE
+            val text =
+                if (App.user.user_name == null) scoreText else App.user.user_name + ", " + scoreText
+            binding.myRecordTextView.text = text
+            binding.topLoadingProgress.visibility = View.GONE
             users?.forEach {
                 if (it.user_name == App.user.user_name) {
                     adapter.add(UserItem(it, true))
                 } else {
-                    adapter.add(UserItem(it,false))
+                    adapter.add(UserItem(it, false))
                 }
             }
-        })
+        }
     }
 
     private fun getInitialTopUsers() {
-        topLoadingProgress.visibility = View.VISIBLE
+        binding.topLoadingProgress.visibility = View.VISIBLE
         viewModel.getInitialTopUsers()
     }
 

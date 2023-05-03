@@ -24,32 +24,28 @@ class UserViewModel @Inject constructor(
     companion object {
         const val bucketUrl = "https://guessauto.s3.eu-north-1.amazonaws.com/public/"
     }
-    val userNameSet = userRepository.userNameSet
 
     val userName = MutableLiveData<String>()
     val url = MutableLiveData<String?>()
 
     init {
-        userName.value = App.user.user_name
-        url.value = App.user.url
-    }
-
-    fun setNewUser( ) {
-        viewModelScope.launch {
-            userRepository.setNewUser(userName.value!!.trim())
-        }
+        userName.value = App.user.user_name ?: ""
+        url.value = App.user.picture_url
     }
 
     fun updateUserName() {
+        App.user.user_name = userName.value!!.trim();
+        Timber.d(App.user.toString())
         viewModelScope.launch {
-            userRepository.updateNewUser(userName.value!!)
+            userRepository.updateUser()
         }
     }
 
-    val userImageSet = userRepository.userImageSet
+    val userUpdated = userRepository.userUpdated
     fun setUserImage() {
+        App.user.picture_url = url.value!!
         viewModelScope.launch {
-            userRepository.setUserImage(url.value!!)
+            userRepository.updateUser()
         }
     }
 
@@ -65,7 +61,6 @@ class UserViewModel @Inject constructor(
                 "$uniqueId.jpg",
                 selectedImageFile,
                 { result ->
-                    //Timber.d("Upload_successful - %s", result.toString())
                     url.postValue(bucketUrl + result.key)
                     _uploadToS3RequestFinished.postValue(Event("OK"))
                 },
@@ -81,8 +76,9 @@ class UserViewModel @Inject constructor(
     }
 
     fun removeImageForUser() {
+        App.user.picture_url = null
         viewModelScope.launch {
-            userRepository.setUserImage(null)
+            userRepository.updateUser()
         }
     }
 
@@ -92,7 +88,7 @@ class UserViewModel @Inject constructor(
     fun removeImageFromS3() {
         val key = url.value!!.removePrefix(bucketUrl)
         Amplify.Storage.remove(key,
-            { result ->
+            {
                 _deleteFromS3RequestFinished.postValue(Event("OK"))
             },
             { error ->

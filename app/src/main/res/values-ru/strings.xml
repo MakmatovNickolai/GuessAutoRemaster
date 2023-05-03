@@ -13,6 +13,7 @@
     <string name="user_already_exists">Такой пользователь уже есть</string>
     <string name="unknown_error">Неизвестная ошибка: %1$s</string>
     <string name="user_changed">Никнейм успешно изменён</string>
+    <string name="user_update_success">Изменения сохранены</string>
     <string name="no_internet_connection">Не удалось загрузить фото, похоже проблемы с интернетом</string>
     <string name="gameOverText">Игра закончена</string>
     <string name="choose_image_from_gallery">Галерея</string>

@@ -1,10 +1,12 @@
 package kon4.sam.guessauto.data
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import kon4.sam.guessauto.R
+import kon4.sam.guessauto.data.model.Car
 import kon4.sam.guessauto.util.SharedPrefsHelper
 import org.xmlpull.v1.XmlPullParser
 import timber.log.Timber
@@ -14,6 +16,7 @@ class DBHelper(private val fContext: Context, private val sharedPrefsHelper: Sha
 
     private var database = this.writableDatabase
 
+    var cars: MutableList<Car> = mutableListOf()
     override fun onOpen(db: SQLiteDatabase?) {
         super.onOpen(db)
 
@@ -74,6 +77,8 @@ class DBHelper(private val fContext: Context, private val sharedPrefsHelper: Sha
                     values.put("AutoName", autoName)
                     values.put("buttons", buttons)
                     values.put("link", link)
+                    val car = Car(name = autoName, picture_url = link, similar_cars = buttons)
+                    cars.add(car)
                     db.insert(TABLE_NAME, null, values)
                 }
                 eventType = xml.next()
@@ -86,6 +91,7 @@ class DBHelper(private val fContext: Context, private val sharedPrefsHelper: Sha
         }
     }
 
+    @SuppressLint("Range")
     fun getAllCaptionsForAuto(autoName: String) : MutableList<String> {
         val selectQuery = "SELECT  buttons FROM mytable WHERE AutoName = ?"
         var captions = "No captions fetched from db"
@@ -100,6 +106,7 @@ class DBHelper(private val fContext: Context, private val sharedPrefsHelper: Sha
         return res
     }
 
+    @SuppressLint("Range")
     fun getAutoLink(AutoName:String) : String {
         val sqlQuery = "select link from mytable where AutoName = ?"
         var res = "No auto fetched from db"

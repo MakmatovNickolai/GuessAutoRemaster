@@ -28,7 +28,7 @@
             app:titleTextColor="@color/bluePrimary"/>
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profile_photo_icon"
+            android:id="@+id/profilePhotoIcon"
             android:layout_width="@dimen/in_user_avatar_size"
             android:layout_height="@dimen/in_user_avatar_size"
             android:layout_marginTop="8dp"
@@ -103,7 +103,7 @@
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView4"
-            app:layout_constraintTop_toBottomOf="@+id/profile_photo_icon">
+            app:layout_constraintTop_toBottomOf="@+id/profilePhotoIcon">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextTextPersonName"

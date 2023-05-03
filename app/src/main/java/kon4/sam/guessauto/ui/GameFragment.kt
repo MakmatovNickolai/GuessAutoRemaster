@@ -1,5 +1,7 @@
 package kon4.sam.guessauto.ui
 
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -16,6 +18,7 @@ import android.view.animation.Animation
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,8 +26,10 @@ import androidx.multidex.BuildConfig
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -35,9 +40,9 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kon4.sam.guessauto.App
 import kon4.sam.guessauto.R
+import kon4.sam.guessauto.databinding.EndgameDialogBinding
 import kon4.sam.guessauto.databinding.FragmentGameBinding
 import kon4.sam.guessauto.view_model.GameViewModel
-import kotlinx.android.synthetic.main.fragment_game.*
 import timber.log.Timber
 
 
@@ -50,7 +55,7 @@ class GameFragment : Fragment() {
     private var isTimerPaused = false
     private var isTimerCancelled = false
     private var mInterstitialAd: InterstitialAd? = null
-    private var endGameDialog: EndGameDialog? = null
+    private var endGameDialog: Dialog? = null
     private val viewModel: GameViewModel by viewModels()
     private lateinit var soundPool: SoundPool
     private lateinit var binding: FragmentGameBinding
@@ -67,7 +72,7 @@ class GameFragment : Fragment() {
                         cancel()
                     }
                     else -> {
-                        progressBar.progress = millisUntilFinished.toInt() / 100
+                        binding.progressBar.progress = millisUntilFinished.toInt() / 100
                     }
                 }
             }
@@ -129,34 +134,28 @@ class GameFragment : Fragment() {
 
 
     private fun setupObservers() {
-        viewModel.showAdEvent.observe(viewLifecycleOwner, {
+        viewModel.showAdEvent.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { needToShowAd ->
                 if (needToShowAd) {
                     mInterstitialAd?.show(this.requireActivity()) ?: onGameEnd()
                 }
             }
-        })
-        /*viewModel.userScoreUpdated.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let { updated ->
-                if (updated) {
-
-                }
-                //onGameEnd()
-                //findNavController().popBackStack()
-            }
-        })*/
+        }
     }
 
     private fun preloadNextImage() {
         try {
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
             Glide.with(this)
                 .load(viewModel.updateAndGetNextImageLink())
+                .apply(requestOptions)
                 .preload()
         } catch (e: Exception) {
             Timber.e(e)
         }
     }
 
+    @SuppressLint("VisibleForTests")
     private fun initAd() {
         val adRequest = AdRequest.Builder().build()
         val adId = if (!BuildConfig.DEBUG) {
@@ -177,7 +176,7 @@ class GameFragment : Fragment() {
                         //onGameEnd()
                     }
 
-                    override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                         onGameEnd()
                     }
 
@@ -206,7 +205,7 @@ class GameFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             showLeaveConfirmation()
         }
     }
@@ -214,8 +213,8 @@ class GameFragment : Fragment() {
     private fun initCaptions() {
         val scoreCaption = resources.getString(R.string.current_score) + " " + 0
         val autoCountCaption = resources.getString(R.string.auto) +": ${0}\\${viewModel.carImages.size}"
-        scoreText.text = scoreCaption
-        autoCountText.text = autoCountCaption
+        binding.scoreText.text = scoreCaption
+        binding.autoCountText.text = autoCountCaption
     }
 
     private fun initSoundPool() {
@@ -237,9 +236,11 @@ class GameFragment : Fragment() {
 
     private fun setNextImage() {
         viewModel.updateCurrentPhotoAutoName()
+        val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
         Glide
             .with(this)
             .load(viewModel.nextImageLink)
+            .apply(requestOptions)
             .listener(object: RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -247,12 +248,13 @@ class GameFragment : Fragment() {
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Toast.makeText(
-                        this@GameFragment.context,
-                        resources.getString(R.string.no_internet_connection),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    //setNewCard()
+//                    Toast.makeText(
+//                        this@GameFragment.context,
+//                        resources.getString(R.string.no_internet_connection),
+//                        Toast.LENGTH_LONG
+//                    ).show()
+                    Timber.e("Can't load $viewModel.nextImageLink")
+                    setNewCard()
                     return false
                 }
 
@@ -267,11 +269,11 @@ class GameFragment : Fragment() {
                     return false
                 }
             })
-            .into(carImage)
+            .into(binding.carImage)
     }
 
     private fun setNewCard() {
-        carImage.fitToScreen()
+        binding.carImage.fitToScreen()
         setButtonsText()
         setButtonDefaultBackground()
         setButtonsEnabled(true)
@@ -304,10 +306,10 @@ class GameFragment : Fragment() {
 
     private fun setButtonsText() {
         val buttons = viewModel.getAllCaptionsForAuto()
-        button1.text = buttons[0]
-        button2.text = buttons[1]
-        button3.text = buttons[2]
-        button4.text = buttons[3]
+        binding.button1.text = buttons[0]
+        binding.button2.text = buttons[1]
+        binding.button3.text = buttons[2]
+        binding.button4.text = buttons[3]
     }
 
     private fun setButtonDefaultBackground() {
@@ -315,10 +317,10 @@ class GameFragment : Fragment() {
     }
 
     private fun setButtonsEnabled(enabled: Boolean) {
-        button1.isEnabled = enabled
-        button2.isEnabled = enabled
-        button3.isEnabled = enabled
-        button4.isEnabled = enabled
+        binding.button1.isEnabled = enabled
+        binding.button2.isEnabled = enabled
+        binding.button3.isEnabled = enabled
+        binding.button4.isEnabled = enabled
     }
 
     private fun pressButton(view: View) {
@@ -330,7 +332,7 @@ class GameFragment : Fragment() {
         val isAnswerCorrect = chosenAutoButtonText == viewModel.currentPhotoAutoName
         if (isAnswerCorrect) {
             soundPool.play(successSound, 1f, 1f, 0, 0, 1f)
-            viewModel.score += progressBar.progress
+            viewModel.score += binding.progressBar.progress
             increaseScoreCaption()
             view.setHasAnswer(true)
             view.setIsCorrectAnswer(true)
@@ -346,9 +348,9 @@ class GameFragment : Fragment() {
                 return
             }
             isAnswerCorrect -> {
-                carImage.startAnimation(disappearing)
+                binding.carImage.startAnimation(disappearing)
             }
-            !isAnswerCorrect -> {
+            else -> {
                 loseAttempt()
             }
         }
@@ -356,12 +358,12 @@ class GameFragment : Fragment() {
 
     private fun increaseScoreCaption() {
         val scoreCaption = resources.getString(R.string.current_score) + " " + viewModel.score
-        scoreText.text = scoreCaption
+        binding.scoreText.text = scoreCaption
     }
 
     private fun increaseAutoCaption() {
         val autoCountCaption = resources.getString(R.string.auto) +": ${viewModel.currentPhotoIndex}\\${viewModel.carImages.size}"
-        autoCountText.text = autoCountCaption
+        binding.autoCountText.text = autoCountCaption
     }
 
     private fun loseAttempt() {
@@ -371,31 +373,104 @@ class GameFragment : Fragment() {
             viewModel.attempt = 0
             showFinalDialog(false)
         } else {
-            carImage.startAnimation(disappearing)
+            binding.carImage.startAnimation(disappearing)
         }
     }
 
     private fun setLoseHeart() {
-        bottomBarLayout.getChildAt(viewModel.attempt).setBackgroundResource(R.drawable.heart_empty)
+        binding.bottomBarLayout.getChildAt(viewModel.attempt).setBackgroundResource(R.drawable.heart_empty)
     }
 
     private fun showFinalDialog(isGameCompleted: Boolean) {
-        val dialog = EndGameDialog(requireContext(), viewModel, viewLifecycleOwner)
+//        val dialog = EndGameDialog(requireContext(), viewModel, viewLifecycleOwner)
+        val dialog = Dialog(requireContext())
+        endGameDialog = dialog
+
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.endgame_dialog)
-        dialog.setupFields()
         val finalText:String = if (isGameCompleted) {
             getCompletedGameDialogCaption()
         } else {
             getDefaultDialogCaption()
         }
-        dialog.setCongratsText(finalText)
+        val bindingDialog = EndgameDialogBinding
+            .inflate(LayoutInflater.from(context));
+        dialog.setContentView(bindingDialog.root)
+        setupDialogFields(bindingDialog)
+        setCongratsText(bindingDialog, finalText)
+        viewModel.userCreated.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { message ->
+                bindingDialog.gameOverOkButton.isEnabled = true
+                when (message) {
+                    "OK" -> {
+                        App.user.score = viewModel.score
+                        viewModel.updateUser()
+                        viewModel.showAd()
+                    }
+
+                    "User exist" -> {
+                        bindingDialog.userNameEditTextLayout.error =
+                            resources.getString(R.string.user_already_exists)
+                    }
+
+                    else -> {
+                        bindingDialog.userNameEditTextLayout.error =
+                            resources.getString(R.string.unknown_error, message)
+                    }
+                }
+            }
+        }
         dialog.show()
-        endGameDialog = dialog
+    }
+
+    private lateinit var userName: String
+
+    private fun setupDialogFields(binding: EndgameDialogBinding) {
+        if (App.user.user_name == null) {
+            setUserNameFields(binding)
+            binding.gameOverOkButton.setOnClickListener {
+                userName = binding.userNameEditText.text.toString()
+                if (userName.isEmpty()) {
+                    binding.userNameEditTextLayout.error = "Enter your nickname"
+                    return@setOnClickListener
+                }
+                if (binding.userNameEditTextLayout.error.isNullOrEmpty()) {
+                    if (userName != App.user.user_name) {
+                        it.isEnabled = false
+                        viewModel.createUser(userName)
+                    }
+                }
+            }
+        } else {
+            if (viewModel.score > App.user.score) {
+                App.user.score = viewModel.score
+                viewModel.updateUser()
+            }
+            binding.gameOverOkButton.setOnClickListener {
+                viewModel.showAd()
+                endGameDialog?.dismiss()
+            }
+        }
+    }
+
+    private fun setUserNameFields(binding: EndgameDialogBinding) {
+        binding.changeUserNameText.visibility = View.VISIBLE
+        binding.userNameEditTextLayout.visibility = View.VISIBLE
+        binding.userNameEditText.doOnTextChanged { text, _, _, _ ->
+            if (text!!.length < 4) {
+                binding.userNameEditTextLayout.error = resources.getString(R.string.username_length_short_error)
+            } else if (text.length >= 4) {
+                binding.userNameEditTextLayout.error = null
+            }
+        }
+    }
+
+    fun setCongratsText(binding: EndgameDialogBinding, text: String) {
+        binding.gameOverTextFull.text = text
     }
 
     private fun getDefaultDialogCaption(): String {
+        Timber.d("App score: ${App.user.score}, current score: ${viewModel.score}")
         return when {
             viewModel.score > App.user.score -> {
                 resources.getString(R.string.congrats) +"\n" +

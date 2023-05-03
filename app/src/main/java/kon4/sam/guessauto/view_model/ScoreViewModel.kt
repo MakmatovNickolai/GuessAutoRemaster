@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kon4.sam.guessauto.network.ApiService
-import kon4.sam.guessauto.network.model.User
+import kon4.sam.guessauto.data.model.User
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,12 +21,12 @@ class ScoreViewModel @Inject constructor(
 
     private var _getAllScoreCompleted = MutableLiveData<List<User>?>()
     val getAllScoreCompleted: LiveData<List<User>?> = _getAllScoreCompleted
-    var page = 1
+    var page = 0
     private var isLoadingUsers = false
 
     fun getInitialTopUsers() {
         if (!isLoadingUsers) {
-            page = 1
+            page = 0
             isLoadingUsers = true
             getTopScoreUsersByPage()
         }

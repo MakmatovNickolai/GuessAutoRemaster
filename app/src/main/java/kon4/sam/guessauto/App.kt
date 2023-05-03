@@ -9,16 +9,21 @@ import com.amplifyframework.core.AmplifyConfiguration
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
-import kon4.sam.guessauto.data.DatabaseUser
+import kon4.sam.guessauto.data.model.User
+import kon4.sam.guessauto.util.RandomString
 import timber.log.Timber
+
 
 @HiltAndroidApp
 class App : Application() {
 
 
     companion object {
+        lateinit var user: User
         lateinit var deviceId: String
-        var user: DatabaseUser = DatabaseUser("", 0 , "")
+        fun createNewUser() {
+            user = User(device_id =  deviceId, user_name = "Player_${RandomString.getRandomString(5)}")
+        }
     }
 
     override fun onCreate() {
@@ -26,9 +31,12 @@ class App : Application() {
         MobileAds.initialize(this) {}
         Timber.plant(Timber.DebugTree())
         initAmplify()
-        deviceId = Settings.Secure.getString(this.applicationContext.contentResolver, Settings.Secure.ANDROID_ID)
+        initUser()
     }
 
+    private fun initUser() {
+        deviceId = Settings.Secure.getString(this.applicationContext.contentResolver, Settings.Secure.ANDROID_ID)
+    }
     private fun initAmplify() {
         try {
             Amplify.addPlugin(AWSCognitoAuthPlugin())
@@ -37,19 +45,6 @@ class App : Application() {
                 .devMenuEnabled(false)
                 .build()
             Amplify.configure(config, applicationContext)
-            /*Amplify.Auth.signIn("uploader", "LYtq2sT6@",
-                { result ->
-                    //result.isSignInComplete
-                    //Timber.d("AuthQuickstart, Sign in succeeded - %s", result.toString())
-                    //Timber.d("AuthQuickstart, isSignInComplete - %s", result.isSignInComplete.toString())
-                },
-                { Timber.e("AuthQuickstart, Failed to sign in ") }
-            )*/
-            //Amplify.Auth.confirmSignIn()
-            /*Amplify.Auth.fetchAuthSession(
-                { Timber.i("AmplifyQuickstart, Auth session = $it") },
-                { Timber.e("AmplifyQuickstart, Failed to fetch auth session - ${it.message}") }
-            )*/
         } catch (error: AmplifyException) {
             Timber.e(error)
         }

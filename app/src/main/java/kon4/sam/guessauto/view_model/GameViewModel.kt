@@ -5,16 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kon4.sam.guessauto.App
 import kon4.sam.guessauto.repository.UserRepository
 import kon4.sam.guessauto.data.DBHelper
+import kon4.sam.guessauto.data.JsonDbHelper
 import kon4.sam.guessauto.util.Event
+import kon4.sam.guessauto.util.SharedPrefsHelper
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val dbHelper: DBHelper
+    private val dbHelper: JsonDbHelper,
 ): ViewModel() {
 
     var currentPhotoIndex = 0
@@ -25,9 +28,6 @@ class GameViewModel @Inject constructor(
     lateinit var carImages: MutableList<String>
     lateinit var currentPhotoAutoName:String
 
-    val userScoreUpdated = userRepository.userScoreUpdated
-    val userInitiated = userRepository.userInitiated
-
     private var _showAdEvent = MutableLiveData<Event<Boolean>>()
     val showAdEvent: LiveData<Event<Boolean>> = _showAdEvent
 
@@ -37,6 +37,7 @@ class GameViewModel @Inject constructor(
     }
 
     private fun initAutoDb() {
+        dbHelper.reloadCarsFromFile()
         carImages = dbHelper.getAllAuto()
         carImages.shuffle()
     }
@@ -54,15 +55,17 @@ class GameViewModel @Inject constructor(
         return dbHelper.getAllCaptionsForAuto(currentPhotoAutoName)
     }
 
-    fun sendUserScore() {
+    fun updateUser() {
         viewModelScope.launch {
-            userRepository.sendUserScore(score)
+            userRepository.updateUser()
         }
     }
 
-    fun initiateUser(userName: String) {
+    val userCreated = userRepository.userCreated
+    fun createUser(userName: String) {
+        App.user.user_name = userName
         viewModelScope.launch {
-            userRepository.initiateUser(userName)
+            userRepository.createUser(App.user)
         }
     }
 
